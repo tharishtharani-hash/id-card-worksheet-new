@@ -281,6 +281,19 @@
         return { isValid: true, message: null };
       }
 
+      function validateCapitalOnly(value, label) {
+        // Check capital letter only (no full stop required)
+        if (value.length === 0) {
+          return { isValid: false, message: `${label} cannot be empty.` };
+        }
+        
+        if (!/^[A-Z]/.test(value)) {
+          return { isValid: false, message: `${label} must start with a capital letter.` };
+        }
+        
+        return { isValid: true, message: null };
+      }
+
       function validateNationality(value, label) {
         // Check: must have a/an + capital letter
         if (value.length === 0) {
@@ -326,7 +339,7 @@
         let anyErrors = false;
         let html = '';
 
-        // Validate NAME (capital letter + full stop only)
+        // Validate NAME (capital letter + full stop)
         const nameValidation = validateCapitalAndFullStop(nameValue, 'Name');
         if (!nameValidation.isValid) {
           anyErrors = true;
@@ -335,7 +348,7 @@
           html += `<div class="success-message">✅ <strong>Name:</strong> "My name is ${nameValue}"</div>`;
         }
 
-        // Validate COUNTRY (capital letter + full stop only)
+        // Validate COUNTRY (capital letter + full stop)
         const countryValidation = validateCapitalAndFullStop(countryValue, 'Country');
         if (!countryValidation.isValid) {
           anyErrors = true;
@@ -353,8 +366,8 @@
           html += `<div class="success-message">✅ <strong>Nationality:</strong> "I am ${nationalityValue}."</div>`;
         }
 
-        // Validate FOOD (capital letter + full stop only)
-        const foodValidation = validateCapitalAndFullStop(foodValue, 'Famous Food');
+        // Validate FOOD (capital letter only, NO full stop)
+        const foodValidation = validateCapitalOnly(foodValue, 'Famous Food');
         if (!foodValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Famous Food:</strong> ${foodValidation.message}</div>`;
@@ -362,8 +375,8 @@
           html += `<div class="success-message">✅ <strong>Famous Food:</strong> "${foodValue} is a famous food in my country."</div>`;
         }
 
-        // Validate PLACE (capital letter + full stop only)
-        const placeValidation = validateCapitalAndFullStop(placeValue, 'Popular Place');
+        // Validate PLACE (capital letter only, NO full stop)
+        const placeValidation = validateCapitalOnly(placeValue, 'Popular Place');
         if (!placeValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Popular Place:</strong> ${placeValidation.message}</div>`;
@@ -371,13 +384,13 @@
           html += `<div class="success-message">✅ <strong>Popular Place:</strong> "In my country, ${placeValue} is a popular place."</div>`;
         }
 
-        // Validate LANGUAGE (capital letter + full stop only)
-        const languageValidation = validateCapitalAndFullStop(languageValue, 'National Language');
+        // Validate LANGUAGE (capital letter only, NO full stop)
+        const languageValidation = validateCapitalOnly(languageValue, 'National Language');
         if (!languageValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>National Language:</strong> ${languageValidation.message}</div>`;
         } else {
-          html += `<div class="success-message">✅ <strong>National Language:</strong> "My country's national language is ${languageValue}"</div>`;
+          html += `<div class="success-message">✅ <strong>National Language:</strong> "My country's national language is ${languageValue}."</div>`;
         }
 
         if (!anyErrors) {
