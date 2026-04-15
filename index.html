@@ -242,7 +242,7 @@
 
       function capitalizeFirstLetter(str) {
         if (str.length === 0) return '';
-        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        return str.charAt(0).toUpperCase() + str.slice(1);
       }
 
       function getArticle(word) {
@@ -275,8 +275,27 @@
         document.getElementById(id).addEventListener('input', updateButtonState);
       });
 
-      function validateProperNoun(value, label) {
-        // For proper nouns, only check capitalization
+      function validateProperNounWithFullStop(value, label) {
+        // For proper nouns, check capitalization AND full stop
+        if (value.length === 0) {
+          return { isValid: false, message: `${label} cannot be empty.` };
+        }
+        
+        // Check if first letter is capitalized
+        if (!/^[A-Z]/.test(value)) {
+          return { isValid: false, message: `${label} must start with a capital letter.` };
+        }
+
+        // Check for full stop at the end
+        if (!value.endsWith('.')) {
+          return { isValid: false, message: `${label} must end with a full stop (.)` };
+        }
+        
+        return { isValid: true, message: null };
+      }
+
+      function validateCapitalization(value, label) {
+        // For country, check capitalization only
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
@@ -301,31 +320,42 @@
         btn.disabled = true;
         resultsDiv.innerHTML = '<p style="text-align: center; font-weight: bold;">⏳ Checking...</p>';
 
-        // Build full sentences with proper capitalization and a/an logic
+        const nameValue = getValue('name');
+        const countryValue = getValue('country');
         const nationalityValue = capitalizeFirstLetter(getValue('nationality'));
+        const foodValue = getValue('food');
+        const placeValue = getValue('place');
+        const languageValue = getValue('language');
+
         const article = getArticle(nationalityValue);
         
-        // Fields to check for grammar (not proper nouns)
+        // Fields to check for grammar (country and nationality)
         const grammarCheckFields = [
-          { label: 'Country',            sentence: 'I am from ' + capitalizeFirstLetter(getValue('country')) + '.' },
+          { label: 'Country',            sentence: 'I am from ' + countryValue + '.' },
           { label: 'Nationality',        sentence: 'I am ' + article + ' ' + nationalityValue + '.' },
         ];
 
-        // Fields to validate only for capitalization (proper nouns)
-        // Full stop is AUTOMATICALLY added in the display
-        const properNounFields = [
-          { label: 'Name',               value: getValue('name'), sentence: 'My name is ' + capitalizeFirstLetter(getValue('name')) + '.' },
-          { label: 'Famous Food',        value: getValue('food'), sentence: capitalizeFirstLetter(getValue('food')) + ' is a famous food in my country.' },
-          { label: 'Popular Place',      value: getValue('place'), sentence: 'In my country, ' + capitalizeFirstLetter(getValue('place')) + ' is a popular place.' },
-          { label: 'National Language',  value: getValue('language'), sentence: 'My country\'s national language is ' + capitalizeFirstLetter(getValue('language')) + '.' },
+        // Fields to validate for capitalization and full stop (proper nouns with full stop)
+        const properNounFieldsWithFullStop = [
+          { label: 'Name',               value: nameValue, sentence: 'My name is ' + nameValue },
+          { label: 'Famous Food',        value: foodValue, sentence: foodValue + ' is a famous food in my country.' },
+          { label: 'Popular Place',      value: placeValue, sentence: 'In my country, ' + placeValue + ' is a popular place.' },
+          { label: 'National Language',  value: languageValue, sentence: 'My country\'s national language is ' + languageValue },
         ];
 
         let anyErrors = false;
         let html = '';
 
-        // Validate proper nouns first (only capitalization)
-        for (const field of properNounFields) {
-          const validation = validateProperNoun(field.value, field.label);
+        // Validate country (capital letter only, no full stop needed)
+        const countryValidation = validateCapitalization(countryValue, 'Country');
+        if (!countryValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Country:</strong> ${countryValidation.message}</div>`;
+        }
+
+        // Validate proper nouns with full stop (capital letter + full stop required)
+        for (const field of properNounFieldsWithFullStop) {
+          const validation = validateProperNounWithFullStop(field.value, field.label);
           if (validation.isValid) {
             html += `<div class="success-message">✅ <strong>${field.label}:</strong> "${field.sentence}"</div>`;
           } else {
@@ -334,7 +364,7 @@
           }
         }
 
-        // Check grammar for non-proper nouns
+        // Check grammar for country and nationality
         for (const field of grammarCheckFields) {
           try {
             const params = new URLSearchParams({
