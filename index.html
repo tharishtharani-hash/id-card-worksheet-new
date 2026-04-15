@@ -174,10 +174,11 @@
       <div class="form-row">
         <label for="country">COUNTRY: I am from</label>
         <input type="text" id="country" placeholder="Enter your country">
+        <span style="margin-left: 5px;">.</span>
       </div>
       <div class="form-row">
         <label for="nationality">NATIONALITY: I am</label>
-        <input type="text" id="nationality" placeholder="Enter your nationality">
+        <input type="text" id="nationality" placeholder="Enter a/an and nationality">
       </div>
       <div class="form-row">
         <label for="food">FAMOUS FOOD: </label>
@@ -240,17 +241,6 @@
         return document.getElementById(id).value.trim();
       }
 
-      function capitalizeFirstLetter(str) {
-        if (str.length === 0) return '';
-        return str.charAt(0).toUpperCase() + str.slice(1);
-      }
-
-      function getArticle(word) {
-        if (word.length === 0) return 'a';
-        const vowels = ['a', 'e', 'i', 'o', 'u'];
-        return vowels.includes(word.charAt(0).toLowerCase()) ? 'an' : 'a';
-      }
-
       function checkAllFieldsFilled() {
         const fields = ['name', 'country', 'nationality', 'food', 'place', 'language'];
         return fields.every(id => getValue(id).length > 0);
@@ -294,39 +284,6 @@
         return { isValid: true, message: null };
       }
 
-      function validateCapitalization(value, label) {
-        // For country, check capitalization only
-        if (value.length === 0) {
-          return { isValid: false, message: `${label} cannot be empty.` };
-        }
-        
-        // Check if first letter is capitalized
-        if (!/^[A-Z]/.test(value)) {
-          return { isValid: false, message: `${label} must start with a capital letter.` };
-        }
-        
-        return { isValid: true, message: null };
-      }
-
-      function validateNationality(value, label) {
-        // For nationality, check capitalization AND full stop
-        if (value.length === 0) {
-          return { isValid: false, message: `${label} cannot be empty.` };
-        }
-        
-        // Check if first letter is capitalized
-        if (!/^[A-Z]/.test(value)) {
-          return { isValid: false, message: `${label} must start with a capital letter.` };
-        }
-
-        // Check for full stop at the end
-        if (!value.endsWith('.')) {
-          return { isValid: false, message: `${label} must end with a full stop (.)` };
-        }
-        
-        return { isValid: true, message: null };
-      }
-
       async function checkGrammar() {
         const resultsDiv = document.getElementById('results');
 
@@ -345,55 +302,21 @@
         const foodValue = getValue('food');
         const placeValue = getValue('place');
         const languageValue = getValue('language');
-
-        // Remove full stop from nationality for processing, then add it back
-        const nationalityWithoutStop = nationalityValue.endsWith('.') ? nationalityValue.slice(0, -1) : nationalityValue;
-        const nationalityCapitalized = capitalizeFirstLetter(nationalityWithoutStop);
-        const article = getArticle(nationalityCapitalized);
         
-        // Fields to check for grammar (country and nationality with article)
+        // Build complete sentences exactly as user typed them
         const grammarCheckFields = [
+          { label: 'Name',               sentence: 'My name is ' + nameValue + '.' },
           { label: 'Country',            sentence: 'I am from ' + countryValue + '.' },
-          { label: 'Nationality',        sentence: 'I am ' + article + ' ' + nationalityCapitalized + '.' },
-        ];
-
-        // Fields to validate for capitalization and full stop (proper nouns with full stop)
-        const properNounFieldsWithFullStop = [
-          { label: 'Name',               value: nameValue, sentence: 'My name is ' + nameValue },
-          { label: 'Famous Food',        value: foodValue, sentence: foodValue + ' is a famous food in my country.' },
-          { label: 'Popular Place',      value: placeValue, sentence: 'In my country, ' + placeValue + ' is a popular place.' },
-          { label: 'National Language',  value: languageValue, sentence: 'My country\'s national language is ' + languageValue },
+          { label: 'Nationality',        sentence: 'I am ' + nationalityValue + '.' },
+          { label: 'Famous Food',        sentence: foodValue + ' is a famous food in my country.' },
+          { label: 'Popular Place',      sentence: 'In my country, ' + placeValue + ' is a popular place.' },
+          { label: 'National Language',  sentence: 'My country\'s national language is ' + languageValue + '.' },
         ];
 
         let anyErrors = false;
         let html = '';
 
-        // Validate country (capital letter only, no full stop needed)
-        const countryValidation = validateCapitalization(countryValue, 'Country');
-        if (!countryValidation.isValid) {
-          anyErrors = true;
-          html += `<div class="error-message">❌ <strong>Country:</strong> ${countryValidation.message}</div>`;
-        }
-
-        // Validate nationality (capital letter + full stop required)
-        const nationalityValidation = validateNationality(nationalityValue, 'Nationality');
-        if (!nationalityValidation.isValid) {
-          anyErrors = true;
-          html += `<div class="error-message">❌ <strong>Nationality:</strong> ${nationalityValidation.message}</div>`;
-        }
-
-        // Validate proper nouns with full stop (capital letter + full stop required)
-        for (const field of properNounFieldsWithFullStop) {
-          const validation = validateProperNounWithFullStop(field.value, field.label);
-          if (validation.isValid) {
-            html += `<div class="success-message">✅ <strong>${field.label}:</strong> "${field.sentence}"</div>`;
-          } else {
-            anyErrors = true;
-            html += `<div class="error-message">❌ <strong>${field.label}:</strong> ${validation.message}</div>`;
-          }
-        }
-
-        // Check grammar for country and nationality
+        // Check all fields for grammar and formatting
         for (const field of grammarCheckFields) {
           try {
             const params = new URLSearchParams({
