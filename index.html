@@ -295,7 +295,7 @@
       }
 
       function validateCapitalization(value, label) {
-        // For country, check capitalization only
+        // For country and nationality, check capitalization only
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
@@ -322,17 +322,19 @@
 
         const nameValue = getValue('name');
         const countryValue = getValue('country');
-        const nationalityValue = capitalizeFirstLetter(getValue('nationality'));
+        const nationalityValue = getValue('nationality');
         const foodValue = getValue('food');
         const placeValue = getValue('place');
         const languageValue = getValue('language');
 
-        const article = getArticle(nationalityValue);
+        // Capitalize nationality for sentence building and article check
+        const nationalityCapitalized = capitalizeFirstLetter(nationalityValue);
+        const article = getArticle(nationalityCapitalized);
         
         // Fields to check for grammar (country and nationality)
         const grammarCheckFields = [
           { label: 'Country',            sentence: 'I am from ' + countryValue + '.' },
-          { label: 'Nationality',        sentence: 'I am ' + article + ' ' + nationalityValue + '.' },
+          { label: 'Nationality',        sentence: 'I am ' + article + ' ' + nationalityCapitalized + '.' },
         ];
 
         // Fields to validate for capitalization and full stop (proper nouns with full stop)
@@ -343,6 +345,9 @@
           { label: 'National Language',  value: languageValue, sentence: 'My country\'s national language is ' + languageValue },
         ];
 
+        // Validate nationality capitalization
+        const nationalityValidation = validateCapitalization(nationalityValue, 'Nationality');
+
         let anyErrors = false;
         let html = '';
 
@@ -351,6 +356,12 @@
         if (!countryValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Country:</strong> ${countryValidation.message}</div>`;
+        }
+
+        // Validate nationality (capital letter only, no full stop needed)
+        if (!nationalityValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Nationality:</strong> ${nationalityValidation.message}</div>`;
         }
 
         // Validate proper nouns with full stop (capital letter + full stop required)
