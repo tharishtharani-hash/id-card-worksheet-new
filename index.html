@@ -174,11 +174,10 @@
       <div class="form-row">
         <label for="country">COUNTRY: I am from</label>
         <input type="text" id="country" placeholder="Enter your country">
-        <span style="margin-left: 5px;">.</span>
       </div>
       <div class="form-row">
         <label for="nationality">NATIONALITY: I am</label>
-        <input type="text" id="nationality" placeholder="Enter a/an and nationality">
+        <input type="text" id="nationality" placeholder="a/an Nationality">
       </div>
       <div class="form-row">
         <label for="food">FAMOUS FOOD: </label>
@@ -265,22 +264,43 @@
         document.getElementById(id).addEventListener('input', updateButtonState);
       });
 
-      function validateProperNounWithFullStop(value, label) {
-        // For proper nouns (Name, Food, Place, Language), check capitalization AND full stop
+      function validateCapitalAndFullStop(value, label) {
+        // Check capital letter and full stop only
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
         
-        // Check if first letter is capitalized
         if (!/^[A-Z]/.test(value)) {
           return { isValid: false, message: `${label} must start with a capital letter.` };
         }
 
-        // Check for full stop at the end
         if (!value.endsWith('.')) {
           return { isValid: false, message: `${label} must end with a full stop (.)` };
         }
         
+        return { isValid: true, message: null };
+      }
+
+      function validateNationality(value, label) {
+        // Check: must have a/an + capital letter
+        if (value.length === 0) {
+          return { isValid: false, message: `${label} cannot be empty.` };
+        }
+
+        // Check if it starts with "a " or "an "
+        const startsWithArticle = value.toLowerCase().startsWith('a ') || value.toLowerCase().startsWith('an ');
+        if (!startsWithArticle) {
+          return { isValid: false, message: `${label} must start with "a" or "an".` };
+        }
+
+        // Extract the nationality part (after a/an)
+        const nationalityPart = value.substring(value.indexOf(' ') + 1);
+
+        // Check if nationality starts with capital letter
+        if (!/^[A-Z]/.test(nationalityPart)) {
+          return { isValid: false, message: `${label} nationality must start with a capital letter.` };
+        }
+
         return { isValid: true, message: null };
       }
 
@@ -302,57 +322,62 @@
         const foodValue = getValue('food');
         const placeValue = getValue('place');
         const languageValue = getValue('language');
-        
-        // Build complete sentences exactly as user typed them
-        const grammarCheckFields = [
-          { label: 'Name',               sentence: 'My name is ' + nameValue + '.' },
-          { label: 'Country',            sentence: 'I am from ' + countryValue + '.' },
-          { label: 'Nationality',        sentence: 'I am ' + nationalityValue + '.' },
-          { label: 'Famous Food',        sentence: foodValue + ' is a famous food in my country.' },
-          { label: 'Popular Place',      sentence: 'In my country, ' + placeValue + ' is a popular place.' },
-          { label: 'National Language',  sentence: 'My country\'s national language is ' + languageValue + '.' },
-        ];
 
         let anyErrors = false;
         let html = '';
 
-        // Check all fields for grammar and formatting
-        for (const field of grammarCheckFields) {
-          try {
-            const params = new URLSearchParams({
-              text: field.sentence,
-              language: 'en-US',
-            });
+        // Validate NAME (capital letter + full stop only)
+        const nameValidation = validateCapitalAndFullStop(nameValue, 'Name');
+        if (!nameValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Name:</strong> ${nameValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Name:</strong> "My name is ${nameValue}"</div>`;
+        }
 
-            const response = await fetch('https://api.languagetool.org/v2/check', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-              body: params.toString(),
-            });
+        // Validate COUNTRY (capital letter + full stop only)
+        const countryValidation = validateCapitalAndFullStop(countryValue, 'Country');
+        if (!countryValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Country:</strong> ${countryValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Country:</strong> "I am from ${countryValue}"</div>`;
+        }
 
-            if (!response.ok) throw new Error('LanguageTool API error: ' + response.status);
+        // Validate NATIONALITY (must have a/an + capital letter)
+        const nationalityValidation = validateNationality(nationalityValue, 'Nationality');
+        if (!nationalityValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Nationality:</strong> ${nationalityValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Nationality:</strong> "I am ${nationalityValue}."</div>`;
+        }
 
-            const data = await response.json();
-            const matches = data.matches;
+        // Validate FOOD (capital letter + full stop only)
+        const foodValidation = validateCapitalAndFullStop(foodValue, 'Famous Food');
+        if (!foodValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Famous Food:</strong> ${foodValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Famous Food:</strong> "${foodValue} is a famous food in my country."</div>`;
+        }
 
-            if (matches.length === 0) {
-              html += `<div class="success-message">✅ <strong>${field.label}:</strong> "${field.sentence}"</div>`;
-            } else {
-              anyErrors = true;
-              html += `<div class="error-message"><strong>❌ ${field.label}:</strong> "${field.sentence}"<ul style="margin-top: 8px; padding-left: 20px;">`;
-              for (const match of matches) {
-                const snippet = field.sentence.substring(match.offset, match.offset + match.length);
-                const suggestions = match.replacements.slice(0, 3).map(r => `<strong>${r.value}</strong>`).join(' or ');
-                html += `<li style="margin: 6px 0;">
-                  <span class="error">"${snippet}"</span>${suggestions ? ' → ' + suggestions : ''}<br>
-                  <small>${match.message}</small>
-                </li>`;
-              }
-              html += '</ul></div>';
-            }
-          } catch (err) {
-            html += `<div class="error-message">❌ Could not check <strong>${field.label}</strong>: ${err.message}</div>`;
-          }
+        // Validate PLACE (capital letter + full stop only)
+        const placeValidation = validateCapitalAndFullStop(placeValue, 'Popular Place');
+        if (!placeValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Popular Place:</strong> ${placeValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Popular Place:</strong> "In my country, ${placeValue} is a popular place."</div>`;
+        }
+
+        // Validate LANGUAGE (capital letter + full stop only)
+        const languageValidation = validateCapitalAndFullStop(languageValue, 'National Language');
+        if (!languageValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>National Language:</strong> ${languageValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>National Language:</strong> "My country's national language is ${languageValue}"</div>`;
         }
 
         if (!anyErrors) {
