@@ -276,7 +276,7 @@
       });
 
       function validateProperNoun(value, label) {
-        // For proper nouns, only check capitalization and full stop
+        // For proper nouns, only check capitalization
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
@@ -311,7 +311,8 @@
           { label: 'Nationality',        sentence: 'I am ' + article + ' ' + nationalityValue + '.' },
         ];
 
-        // Fields to validate only for capitalization and full stop (proper nouns)
+        // Fields to validate only for capitalization (proper nouns)
+        // Full stop is AUTOMATICALLY added in the display
         const properNounFields = [
           { label: 'Name',               value: getValue('name'), sentence: 'My name is ' + capitalizeFirstLetter(getValue('name')) + '.' },
           { label: 'Famous Food',        value: getValue('food'), sentence: capitalizeFirstLetter(getValue('food')) + ' is a famous food in my country.' },
