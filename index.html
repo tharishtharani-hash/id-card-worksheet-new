@@ -276,7 +276,7 @@
       });
 
       function validateProperNounWithFullStop(value, label) {
-        // For proper nouns, check capitalization AND full stop
+        // For proper nouns (Name, Food, Place, Language), check capitalization AND full stop
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
@@ -295,7 +295,7 @@
       }
 
       function validateCapitalization(value, label) {
-        // For country and nationality, check capitalization only
+        // For country, check capitalization only
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
@@ -303,6 +303,25 @@
         // Check if first letter is capitalized
         if (!/^[A-Z]/.test(value)) {
           return { isValid: false, message: `${label} must start with a capital letter.` };
+        }
+        
+        return { isValid: true, message: null };
+      }
+
+      function validateNationality(value, label) {
+        // For nationality, check capitalization AND full stop
+        if (value.length === 0) {
+          return { isValid: false, message: `${label} cannot be empty.` };
+        }
+        
+        // Check if first letter is capitalized
+        if (!/^[A-Z]/.test(value)) {
+          return { isValid: false, message: `${label} must start with a capital letter.` };
+        }
+
+        // Check for full stop at the end
+        if (!value.endsWith('.')) {
+          return { isValid: false, message: `${label} must end with a full stop (.)` };
         }
         
         return { isValid: true, message: null };
@@ -327,11 +346,12 @@
         const placeValue = getValue('place');
         const languageValue = getValue('language');
 
-        // Capitalize nationality for sentence building and article check
-        const nationalityCapitalized = capitalizeFirstLetter(nationalityValue);
+        // Remove full stop from nationality for processing, then add it back
+        const nationalityWithoutStop = nationalityValue.endsWith('.') ? nationalityValue.slice(0, -1) : nationalityValue;
+        const nationalityCapitalized = capitalizeFirstLetter(nationalityWithoutStop);
         const article = getArticle(nationalityCapitalized);
         
-        // Fields to check for grammar (country and nationality)
+        // Fields to check for grammar (country and nationality with article)
         const grammarCheckFields = [
           { label: 'Country',            sentence: 'I am from ' + countryValue + '.' },
           { label: 'Nationality',        sentence: 'I am ' + article + ' ' + nationalityCapitalized + '.' },
@@ -345,9 +365,6 @@
           { label: 'National Language',  value: languageValue, sentence: 'My country\'s national language is ' + languageValue },
         ];
 
-        // Validate nationality capitalization
-        const nationalityValidation = validateCapitalization(nationalityValue, 'Nationality');
-
         let anyErrors = false;
         let html = '';
 
@@ -358,7 +375,8 @@
           html += `<div class="error-message">❌ <strong>Country:</strong> ${countryValidation.message}</div>`;
         }
 
-        // Validate nationality (capital letter only, no full stop needed)
+        // Validate nationality (capital letter + full stop required)
+        const nationalityValidation = validateNationality(nationalityValue, 'Nationality');
         if (!nationalityValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Nationality:</strong> ${nationalityValidation.message}</div>`;
