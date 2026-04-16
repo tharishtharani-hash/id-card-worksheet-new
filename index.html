@@ -184,7 +184,6 @@
           <div class="field-input-wrapper">
             <span class="field-prefix">My name is</span>
             <input type="text" id="name" placeholder="Enter your name">
-            <span class="field-suffix">.</span>
           </div>
         </div>
 
@@ -193,7 +192,6 @@
           <div class="field-input-wrapper">
             <span class="field-prefix">I am from</span>
             <input type="text" id="country" placeholder="Enter your country">
-            <span class="field-suffix">.</span>
           </div>
         </div>
 
@@ -202,7 +200,6 @@
           <div class="field-input-wrapper">
             <span class="field-prefix">I am</span>
             <input type="text" id="nationality" placeholder="a/an Nationality">
-            <span class="field-suffix">.</span>
           </div>
         </div>
 
@@ -210,7 +207,7 @@
           <label class="field-label"><span>FAMOUS FOOD:</span></label>
           <div class="field-input-wrapper">
             <input type="text" id="food" placeholder="Enter famous food">
-            <span class="field-suffix">is a famous food in my country.</span>
+            <span class="field-suffix">is a famous food in my country</span>
           </div>
         </div>
 
@@ -219,7 +216,7 @@
           <div class="field-input-wrapper">
             <span class="field-prefix">In my country,</span>
             <textarea id="place" rows="1" placeholder="Enter popular place"></textarea>
-            <span class="field-suffix">is a popular place.</span>
+            <span class="field-suffix">is a popular place</span>
           </div>
         </div>
 
@@ -228,7 +225,6 @@
           <div class="field-input-wrapper">
             <span class="field-prefix">My country's national language is</span>
             <textarea id="language" rows="1" placeholder="Enter language"></textarea>
-            <span class="field-suffix">.</span>
           </div>
         </div>
 
@@ -269,7 +265,7 @@
         'pakistan': '🇵🇰',
         'bangladesh': '🇧🇩',
         'sri lanka': '🇱🇰',
-        'new zealand': '🇳🇿',
+        'new zealand': '🇳���',
       };
 
       function getValue(id) {
@@ -370,7 +366,7 @@
         let html = '';
         let allSentences = {};
 
-        // Validate NAME
+        // Validate NAME (requires full stop)
         const nameValidation = validateCapitalAndFullStop(nameValue, 'Name');
         allSentences.name = `My name is ${nameValue}`;
         if (!nameValidation.isValid) {
@@ -380,7 +376,7 @@
           html += `<div class="success-message">✅ <strong>Name:</strong> "My name is ${nameValue}"</div>`;
         }
 
-        // Validate COUNTRY
+        // Validate COUNTRY (requires full stop)
         const countryValidation = validateCapitalAndFullStop(countryValue, 'Country');
         allSentences.country = `I am from ${countryValue}`;
         if (!countryValidation.isValid) {
@@ -390,7 +386,7 @@
           html += `<div class="success-message">✅ <strong>Country:</strong> "I am from ${countryValue}"</div>`;
         }
 
-        // Validate NATIONALITY
+        // Validate NATIONALITY (a/an + capital letter, no full stop)
         const nationalityValidation = validateNationality(nationalityValue, 'Nationality');
         allSentences.nationality = `I am ${nationalityValue}`;
         if (!nationalityValidation.isValid) {
@@ -400,7 +396,7 @@
           html += `<div class="success-message">✅ <strong>Nationality:</strong> "I am ${nationalityValue}."</div>`;
         }
 
-        // Validate FOOD
+        // Validate FOOD (capital letter only, no full stop)
         const foodValidation = validateCapitalOnly(foodValue, 'Famous Food');
         allSentences.food = `${foodValue} is a famous food in my country`;
         if (!foodValidation.isValid) {
@@ -410,7 +406,7 @@
           html += `<div class="success-message">✅ <strong>Famous Food:</strong> "${foodValue} is a famous food in my country."</div>`;
         }
 
-        // Validate PLACE
+        // Validate PLACE (capital letter only, no full stop)
         const placeValidation = validateCapitalOnly(placeValue, 'Popular Place');
         allSentences.place = `In my country, ${placeValue} is a popular place`;
         if (!placeValidation.isValid) {
@@ -420,14 +416,14 @@
           html += `<div class="success-message">✅ <strong>Popular Place:</strong> "In my country, ${placeValue} is a popular place."</div>`;
         }
 
-        // Validate LANGUAGE
-        const languageValidation = validateCapitalOnly(languageValue, 'National Language');
+        // Validate LANGUAGE (requires full stop)
+        const languageValidation = validateCapitalAndFullStop(languageValue, 'National Language');
         allSentences.language = `My country's national language is ${languageValue}`;
         if (!languageValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>National Language:</strong> ${languageValidation.message}</div>`;
         } else {
-          html += `<div class="success-message">✅ <strong>National Language:</strong> "My country's national language is ${languageValue}."</div>`;
+          html += `<div class="success-message">✅ <strong>National Language:</strong> "My country's national language is ${languageValue}"</div>`;
         }
 
         // If no errors, show paragraph form
