@@ -7,7 +7,7 @@
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        max-width: 800px;
+        max-width: 900px;
         margin: 40px auto;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         padding: 20px;
@@ -40,25 +40,43 @@
         margin: 10px 0;
         min-height: 60px;
       }
-      label { 
-        display: inline-block;
-        width: 280px;
-        margin-right: -10px;
-        font-weight: 600;
-        vertical-align: middle;
-        text-align: left;
+      .field-group {
+        margin-bottom: 25px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid #ddd;
+      }
+      .field-group:last-child {
+        border-bottom: none;
+      }
+      .field-label {
+        font-weight: 700;
         color: #333;
+        font-size: 1.1em;
+        margin-bottom: 10px;
+        display: block;
+      }
+      .field-label span {
+        color: #667eea;
+      }
+      .field-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .field-prefix {
+        color: #666;
+        font-weight: 500;
       }
       input, textarea { 
-        display: inline-block;
-        width: 30%;
-        padding: 10px;
-        box-sizing: border-box;
-        vertical-align: middle;
+        padding: 10px 15px;
         border: 2px solid #667eea;
         border-radius: 8px;
         font-size: 14px;
+        font-family: 'Segoe UI', sans-serif;
         transition: border-color 0.3s, box-shadow 0.3s;
+        flex: 1;
+        min-width: 200px;
       }
       input:focus, textarea:focus {
         outline: none;
@@ -66,30 +84,9 @@
         box-shadow: 0 0 8px rgba(118, 75, 162, 0.3);
         background: #fff;
       }
-      .form-row { 
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin: 18px 0;
-        flex-wrap: wrap;
-      }
-      .place-row label { 
-        flex: 0 0 auto;
-        font-weight: 600;
-        white-space: nowrap;
-      }
-      .place-row textarea { 
-        flex: 1 1 20px;
-        min-width: 150px;
-        padding: 8px 10px;
-        border: 2px solid #667eea;
-        border-radius: 8px;
-        font-family: 'Segoe UI', sans-serif;
-      }
-      @media (max-width: 500px) {
-        .form-row { flex-direction: column; align-items: flex-start; gap: 8px; }
-        input, textarea { width: 100%; }
-        label { width: 100%; margin-right: 0; }
+      .field-suffix {
+        color: #666;
+        font-weight: 500;
       }
       button { 
         display: block;
@@ -116,8 +113,8 @@
         opacity: 0.6;
       }
       #results { 
-        margin-top: 30px;
-        padding: 20px;
+        margin-top: 40px;
+        padding: 30px;
         background: linear-gradient(135deg, #fff3cd 0%, #ffe699 100%);
         border: 3px solid #ffc107;
         border-radius: 12px;
@@ -125,10 +122,6 @@
       }
       .error { 
         color: #d32f2f;
-        font-weight: 700;
-      }
-      .ok { 
-        color: #388e3c;
         font-weight: 700;
       }
       .error-message {
@@ -155,7 +148,25 @@
         text-align: center;
         font-size: 1.3em;
         font-weight: 700;
+        margin-bottom: 20px;
+      }
+      .paragraph-section {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        margin-top: 20px;
+        border: 2px solid #4caf50;
+      }
+      .paragraph-section h3 {
+        color: #4caf50;
         margin-bottom: 15px;
+        font-size: 1.2em;
+      }
+      .paragraph-text {
+        font-size: 1.05em;
+        line-height: 1.8;
+        color: #333;
+        text-align: justify;
       }
     </style>
   </head>
@@ -167,37 +178,62 @@
         <div class="flag-display" id="flagDisplay"></div>
       </div>
 
-      <div class="form-row">
-        <label for="name">NAME: My name is</label>
-        <input type="text" id="name" placeholder="Enter your name">
-      </div>
-      <div class="form-row">
-        <label for="country">COUNTRY: I am from</label>
-        <input type="text" id="country" placeholder="Enter your country">
-      </div>
-      <div class="form-row">
-        <label for="nationality">NATIONALITY: I am</label>
-        <input type="text" id="nationality" placeholder="a/an Nationality">
-      </div>
-      <div class="form-row">
-        <label for="food">FAMOUS FOOD: </label>
-        <input type="text" id="food" placeholder="Enter famous food">
-        <span style="margin-left: 5px;">is a famous food in my country.</span>
-      </div>
-      <div class="form-row place-row">
-        <label for="place">POPULAR PLACE: In my country,
-          <textarea id="place" rows="1" placeholder="Enter popular place"></textarea>
-          is a popular place.
-        </label>
-      </div>
-      <div class="form-row place-row">
-        <label for="language">NATIONAL LANGUAGE: My country's national language is
-          <textarea id="language" rows="1" placeholder="Enter language"></textarea>
-          .
-        </label>
-      </div>
+      <div id="formContainer">
+        <div class="field-group">
+          <label class="field-label"><span>NAME:</span></label>
+          <div class="field-input-wrapper">
+            <span class="field-prefix">My name is</span>
+            <input type="text" id="name" placeholder="Enter your name">
+            <span class="field-suffix">.</span>
+          </div>
+        </div>
 
-      <button id="submitBtn">Submit</button>
+        <div class="field-group">
+          <label class="field-label"><span>COUNTRY:</span></label>
+          <div class="field-input-wrapper">
+            <span class="field-prefix">I am from</span>
+            <input type="text" id="country" placeholder="Enter your country">
+            <span class="field-suffix">.</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label"><span>NATIONALITY:</span></label>
+          <div class="field-input-wrapper">
+            <span class="field-prefix">I am</span>
+            <input type="text" id="nationality" placeholder="a/an Nationality">
+            <span class="field-suffix">.</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label"><span>FAMOUS FOOD:</span></label>
+          <div class="field-input-wrapper">
+            <input type="text" id="food" placeholder="Enter famous food">
+            <span class="field-suffix">is a famous food in my country.</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label"><span>POPULAR PLACE:</span></label>
+          <div class="field-input-wrapper">
+            <span class="field-prefix">In my country,</span>
+            <textarea id="place" rows="1" placeholder="Enter popular place"></textarea>
+            <span class="field-suffix">is a popular place.</span>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label"><span>NATIONAL LANGUAGE:</span></label>
+          <div class="field-input-wrapper">
+            <span class="field-prefix">My country's national language is</span>
+            <textarea id="language" rows="1" placeholder="Enter language"></textarea>
+            <span class="field-suffix">.</span>
+          </div>
+        </div>
+
+        <button id="submitBtn">Submit</button>
+      </div>
     </div>
     <div id="results"></div>
 
@@ -265,7 +301,6 @@
       });
 
       function validateCapitalAndFullStop(value, label) {
-        // Check capital letter and full stop only
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
@@ -282,7 +317,6 @@
       }
 
       function validateCapitalOnly(value, label) {
-        // Check capital letter only (no full stop required)
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
@@ -295,21 +329,17 @@
       }
 
       function validateNationality(value, label) {
-        // Check: must have a/an + capital letter
         if (value.length === 0) {
           return { isValid: false, message: `${label} cannot be empty.` };
         }
 
-        // Check if it starts with "a " or "an "
         const startsWithArticle = value.toLowerCase().startsWith('a ') || value.toLowerCase().startsWith('an ');
         if (!startsWithArticle) {
           return { isValid: false, message: `${label} must start with "a" or "an".` };
         }
 
-        // Extract the nationality part (after a/an)
         const nationalityPart = value.substring(value.indexOf(' ') + 1);
 
-        // Check if nationality starts with capital letter
         if (!/^[A-Z]/.test(nationalityPart)) {
           return { isValid: false, message: `${label} nationality must start with a capital letter.` };
         }
@@ -338,9 +368,11 @@
 
         let anyErrors = false;
         let html = '';
+        let allSentences = {};
 
-        // Validate NAME (capital letter + full stop)
+        // Validate NAME
         const nameValidation = validateCapitalAndFullStop(nameValue, 'Name');
+        allSentences.name = `My name is ${nameValue}`;
         if (!nameValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Name:</strong> ${nameValidation.message}</div>`;
@@ -348,8 +380,9 @@
           html += `<div class="success-message">✅ <strong>Name:</strong> "My name is ${nameValue}"</div>`;
         }
 
-        // Validate COUNTRY (capital letter + full stop)
+        // Validate COUNTRY
         const countryValidation = validateCapitalAndFullStop(countryValue, 'Country');
+        allSentences.country = `I am from ${countryValue}`;
         if (!countryValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Country:</strong> ${countryValidation.message}</div>`;
@@ -357,8 +390,9 @@
           html += `<div class="success-message">✅ <strong>Country:</strong> "I am from ${countryValue}"</div>`;
         }
 
-        // Validate NATIONALITY (must have a/an + capital letter)
+        // Validate NATIONALITY
         const nationalityValidation = validateNationality(nationalityValue, 'Nationality');
+        allSentences.nationality = `I am ${nationalityValue}`;
         if (!nationalityValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Nationality:</strong> ${nationalityValidation.message}</div>`;
@@ -366,8 +400,9 @@
           html += `<div class="success-message">✅ <strong>Nationality:</strong> "I am ${nationalityValue}."</div>`;
         }
 
-        // Validate FOOD (capital letter only, NO full stop)
+        // Validate FOOD
         const foodValidation = validateCapitalOnly(foodValue, 'Famous Food');
+        allSentences.food = `${foodValue} is a famous food in my country`;
         if (!foodValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Famous Food:</strong> ${foodValidation.message}</div>`;
@@ -375,8 +410,9 @@
           html += `<div class="success-message">✅ <strong>Famous Food:</strong> "${foodValue} is a famous food in my country."</div>`;
         }
 
-        // Validate PLACE (capital letter only, NO full stop)
+        // Validate PLACE
         const placeValidation = validateCapitalOnly(placeValue, 'Popular Place');
+        allSentences.place = `In my country, ${placeValue} is a popular place`;
         if (!placeValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>Popular Place:</strong> ${placeValidation.message}</div>`;
@@ -384,8 +420,9 @@
           html += `<div class="success-message">✅ <strong>Popular Place:</strong> "In my country, ${placeValue} is a popular place."</div>`;
         }
 
-        // Validate LANGUAGE (capital letter only, NO full stop)
+        // Validate LANGUAGE
         const languageValidation = validateCapitalOnly(languageValue, 'National Language');
+        allSentences.language = `My country's national language is ${languageValue}`;
         if (!languageValidation.isValid) {
           anyErrors = true;
           html += `<div class="error-message">❌ <strong>National Language:</strong> ${languageValidation.message}</div>`;
@@ -393,8 +430,14 @@
           html += `<div class="success-message">✅ <strong>National Language:</strong> "My country's national language is ${languageValue}."</div>`;
         }
 
+        // If no errors, show paragraph form
         if (!anyErrors) {
+          const paragraph = `${allSentences.name}. ${allSentences.country}. ${allSentences.nationality}. ${allSentences.food}. ${allSentences.place}. ${allSentences.language}.`;
           html = '<div class="perfect-banner">🎉 Perfect! No errors found.</div>' + html;
+          html += `<div class="paragraph-section">
+            <h3>📖 Your Complete Paragraph:</h3>
+            <p class="paragraph-text">${paragraph}</p>
+          </div>`;
         }
 
         resultsDiv.innerHTML = html;
