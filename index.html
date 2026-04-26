@@ -1,1 +1,25 @@
-<p>Name: ${name} Country: ${country}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ID Card Worksheet</title>
+</head>
+<body>
+    <h1>ID Card Worksheet Application</h1>
+    <p id="result"></p>
+    <script>
+        const allSentences = {
+            name: "John Doe",
+            country: "USA",
+            nationality: "American",
+            food: "Pizza",
+            place: "New York",
+            language: "English"
+        };
+
+        const paragraph = `${allSentences.name} ${allSentences.country}. ${allSentences.nationality}. ${allSentences.food}. ${allSentences.place}. ${allSentences.language}.`;
+        document.getElementById("result").innerText = paragraph;
+    </script>
+</body>
+</html>
