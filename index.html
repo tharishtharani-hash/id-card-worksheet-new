@@ -270,3 +270,181 @@
       };
 
       function getValue(id) {
+        return document.getElementById(id).value.trim();
+      }
+
+      function checkAllFieldsFilled() {
+        const fields = ['name', 'country', 'nationality', 'food', 'place', 'language'];
+        return fields.every(id => getValue(id).length > 0);
+      }
+
+      function updateFlagDisplay() {
+        const countryInput = getValue('country').toLowerCase();
+        const flag = countryFlags[countryInput] || '🌍';
+        document.getElementById('flagDisplay').textContent = flag;
+      }
+
+      function updateButtonState() {
+        const btn = document.getElementById('submitBtn');
+        const allFilled = checkAllFieldsFilled();
+        btn.disabled = !allFilled;
+        btn.textContent = allFilled ? '✅ Submit' : '⚠️ Fill all fields to submit';
+      }
+
+      // Update on input
+      document.getElementById('country').addEventListener('input', updateFlagDisplay);
+      ['name', 'country', 'nationality', 'food', 'place', 'language'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateButtonState);
+      });
+
+      function validateCapitalAndFullStop(value, label) {
+        if (value.length === 0) {
+          return { isValid: false, message: `${label} cannot be empty.` };
+        }
+
+        if (!/^[A-Z]/.test(value)) {
+          return { isValid: false, message: `${label} must start with a capital letter.` };
+        }
+
+        if (!value.endsWith('.')) {
+          return { isValid: false, message: `${label} must end with a full stop (.)` };
+        }
+
+        return { isValid: true, message: null };
+      }
+
+      function validateCapitalOnly(value, label) {
+        if (value.length === 0) {
+          return { isValid: false, message: `${label} cannot be empty.` };
+        }
+
+        if (!/^[A-Z]/.test(value)) {
+          return { isValid: false, message: `${label} must start with a capital letter.` };
+        }
+
+        return { isValid: true, message: null };
+      }
+
+      function validateNationality(value, label) {
+        if (value.length === 0) {
+          return { isValid: false, message: `${label} cannot be empty.` };
+        }
+
+        const startsWithArticle = value.toLowerCase().startsWith('a ') || value.toLowerCase().startsWith('an ');
+        if (!startsWithArticle) {
+          return { isValid: false, message: `${label} must start with "a" or "an".` };
+        }
+
+        const nationalityPart = value.substring(value.indexOf(' ') + 1);
+
+        if (!/^[A-Z]/.test(nationalityPart)) {
+          return { isValid: false, message: `${label} nationality must start with a capital letter.` };
+        }
+
+        return { isValid: true, message: null };
+      }
+
+      async function checkGrammar() {
+        const resultsDiv = document.getElementById('results');
+
+        if (!checkAllFieldsFilled()) {
+          resultsDiv.innerHTML = '<div class="error-message">❌ Please fill in all fields before submitting!</div>';
+          return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        resultsDiv.innerHTML = '<p style="text-align: center; font-weight: bold;">⏳ Checking...</p>';
+
+        const nameValue = getValue('name');
+        const countryValue = getValue('country');
+        const nationalityValue = getValue('nationality');
+        const foodValue = getValue('food');
+        const placeValue = getValue('place');
+        const languageValue = getValue('language');
+
+        let anyErrors = false;
+        let html = '';
+        let allSentences = {};
+
+        // Validate NAME (requires full stop)
+        const nameValidation = validateCapitalAndFullStop(nameValue, 'Name');
+        allSentences.name = `My name is ${nameValue}`;
+        if (!nameValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Name:</strong> ${nameValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Name:</strong> "My name is ${nameValue}"</div>`;
+        }
+
+        // Validate COUNTRY (requires full stop)
+        const countryValidation = validateCapitalAndFullStop(countryValue, 'Country');
+        allSentences.country = `I am from ${countryValue}`;
+        if (!countryValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Country:</strong> ${countryValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Country:</strong> "I am from ${countryValue}"</div>`;
+        }
+
+        // Validate NATIONALITY (a/an + capital letter, no full stop)
+        const nationalityValidation = validateNationality(nationalityValue, 'Nationality');
+        allSentences.nationality = `I am ${nationalityValue}`;
+        if (!nationalityValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Nationality:</strong> ${nationalityValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Nationality:</strong> "I am ${nationalityValue}."</div>`;
+        }
+
+        // Validate FOOD (capital letter only, no full stop)
+        const foodValidation = validateCapitalOnly(foodValue, 'Famous Food');
+        allSentences.food = `${foodValue} is a famous food in my country`;
+        if (!foodValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Famous Food:</strong> ${foodValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Famous Food:</strong> "${foodValue} is a famous food in my country."</div>`;
+        }
+
+        // Validate PLACE (capital letter only, no full stop)
+        const placeValidation = validateCapitalOnly(placeValue, 'Popular Place');
+        allSentences.place = `In my country, ${placeValue} is a popular place`;
+        if (!placeValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>Popular Place:</strong> ${placeValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>Popular Place:</strong> "In my country, ${placeValue} is a popular place."</div>`;
+        }
+
+        // Validate LANGUAGE (requires full stop)
+        const languageValidation = validateCapitalAndFullStop(languageValue, 'National Language');
+        allSentences.language = `My country's national language is ${languageValue}`;
+        if (!languageValidation.isValid) {
+          anyErrors = true;
+          html += `<div class="error-message">❌ <strong>National Language:</strong> ${languageValidation.message}</div>`;
+        } else {
+          html += `<div class="success-message">✅ <strong>National Language:</strong> "My country's national language is ${languageValue}"</div>`;
+        }
+
+        // If no errors, show paragraph form
+        if (!anyErrors) {
+          const paragraph = `${allSentences.name}. ${allSentences.country}. ${allSentences.nationality}. ${allSentences.food}. ${allSentences.place}. ${allSentences.language}.`;
+          html = '<div class="perfect-banner">🎉 Perfect! No errors found.</div>' + html;
+          html += `<div class="paragraph-section">
+            <h3>📖 Your Complete Paragraph:</h3>
+            <p class="paragraph-text">${paragraph}</p>
+          </div>`;
+        }
+
+        resultsDiv.innerHTML = html;
+        btn.disabled = false;
+      }
+
+      document.getElementById('submitBtn').addEventListener('click', checkGrammar);
+
+      // Initialize button state
+      updateButtonState();
+    </script>
+  </body>
+</html>
