@@ -2,11 +2,9 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ID Card Worksheet</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      
       body { 
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         max-width: 800px;
@@ -15,7 +13,6 @@
         padding: 20px;
         min-height: 100vh;
       }
-      
       .card {
         border: 3px solid #fff;
         padding: 30px;
@@ -23,41 +20,26 @@
         border-radius: 20px;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
       }
-      
       .header {
         text-align: center;
         margin-bottom: 30px;
       }
-      
       .header img { 
         max-width: 80px;
         height: auto;
         margin-bottom: 15px;
       }
-      
       .header h2 {
         color: #333;
         font-size: 2.5em;
         margin-bottom: 10px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
       }
-      
       .flag-display {
         font-size: 4em;
         margin: 10px 0;
         min-height: 60px;
-        transition: transform 0.3s ease;
       }
-      
-      .flag-display:not(:empty) {
-        animation: flagBounce 0.5s ease;
-      }
-      
-      @keyframes flagBounce {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
-      }
-      
       label { 
         display: inline-block;
         width: 280px;
@@ -67,7 +49,6 @@
         text-align: left;
         color: #333;
       }
-      
       input, textarea { 
         display: inline-block;
         width: 30%;
@@ -79,9 +60,299 @@
         font-size: 14px;
         transition: border-color 0.3s, box-shadow 0.3s;
       }
-      
       input:focus, textarea:focus {
         outline: none;
         border-color: #764ba2;
-        box-shadow: 0 0 8*
-
+        box-shadow: 0 0 8px rgba(118, 75, 162, 0.3);
+        background: #fff;
+      }
+      .form-row { 
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 18px 0;
+        flex-wrap: wrap;
+      }
+      .place-row label { 
+        flex: 0 0 auto;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .place-row textarea { 
+        flex: 1 1 20px;
+        min-width: 150px;
+        padding: 8px 10px;
+        border: 2px solid #667eea;
+        border-radius: 8px;
+        font-family: 'Segoe UI', sans-serif;
+      }
+      @media (max-width: 500px) {
+        .form-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+        input, textarea { width: 100%; }
+        label { width: 100%; margin-right: 0; }
+      }
+      button { 
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 35px;
+        padding: 14px 35px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      button:hover:not(:disabled) { 
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+      }
+      button:disabled { 
+        background: #ccc;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+      #results { 
+        margin-top: 30px;
+        padding: 20px;
+        background: linear-gradient(135deg, #fff3cd 0%, #ffe699 100%);
+        border: 3px solid #ffc107;
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+      .error { 
+        color: #d32f2f;
+        font-weight: 700;
+      }
+      .ok { 
+        color: #388e3c;
+        font-weight: 700;
+      }
+      .error-message {
+        background: #ffebee;
+        border-left: 4px solid #d32f2f;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 4px;
+        color: #c62828;
+      }
+      .success-message {
+        background: #e8f5e9;
+        border-left: 4px solid #388e3c;
+        padding: 12px;
+        margin: 10px 0;
+        border-radius: 4px;
+        color: #1b5e20;
+      }
+      .perfect-banner {
+        background: linear-gradient(135deg, #4caf50 0%, #45a049 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px;
+        text-align: center;
+        font-size: 1.3em;
+        font-weight: 700;
+        margin-bottom: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="header">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSLg__6S81P_1_yXgXXlgtWnbK6PmFKb5eVPA&s" alt="ID Card">
+        <h2>🌍 ID CARD</h2>
+        <div class="flag-display" id="flagDisplay"></div>
+      </div>
+
+      <div class="form-row">
+        <label for="name">NAME: My name is</label>
+        <input type="text" id="name" placeholder="Enter your name">
+      </div>
+      <div class="form-row">
+        <label for="country">COUNTRY: I am from</label>
+        <input type="text" id="country" placeholder="Enter your country">
+      </div>
+      <div class="form-row">
+        <label for="nationality">NATIONALITY: I am</label>
+        <input type="text" id="nationality" placeholder="Enter your nationality">
+      </div>
+      <div class="form-row">
+        <label for="food">FAMOUS FOOD: </label>
+        <input type="text" id="food" placeholder="Enter famous food">
+        <span style="margin-left: 5px;">is a famous food in my country.</span>
+      </div>
+      <div class="form-row place-row">
+        <label for="place">POPULAR PLACE: In my country,
+          <textarea id="place" rows="1" placeholder="Enter popular place"></textarea>
+          is a popular place.
+        </label>
+      </div>
+      <div class="form-row place-row">
+        <label for="language">NATIONAL LANGUAGE: My country's national language is
+          <textarea id="language" rows="1" placeholder="Enter language"></textarea>
+          .
+        </label>
+      </div>
+
+      <button id="submitBtn">Submit</button>
+    </div>
+    <div id="results"></div>
+
+    <script>
+      // Country to flag mapping
+      const countryFlags = {
+        'united states': '🇺🇸',
+        'usa': '🇺🇸',
+        'united kingdom': '🇬🇧',
+        'uk': '🇬🇧',
+        'india': '🇮🇳',
+        'france': '🇫🇷',
+        'germany': '🇩🇪',
+        'japan': '🇯🇵',
+        'china': '🇨🇳',
+        'australia': '🇦🇺',
+        'canada': '🇨🇦',
+        'brazil': '🇧🇷',
+        'mexico': '🇲🇽',
+        'spain': '🇪🇸',
+        'italy': '🇮🇹',
+        'south korea': '🇰🇷',
+        'korea': '🇰🇷',
+        'thailand': '🇹🇭',
+        'singapore': '🇸🇬',
+        'malaysia': '🇲🇾',
+        'indonesia': '🇮🇩',
+        'philippines': '🇵🇭',
+        'vietnam': '🇻🇳',
+        'russia': '🇷🇺',
+        'egypt': '🇪🇬',
+        'south africa': '🇿🇦',
+        'pakistan': '🇵🇰',
+        'bangladesh': '🇧🇩',
+        'sri lanka': '🇱🇰',
+        'new zealand': '🇳🇿',
+      };
+
+      function getValue(id) {
+        return document.getElementById(id).value.trim();
+      }
+
+      function capitalizeFirstLetter(str) {
+        if (str.length === 0) return '';
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+      }
+
+      function getArticle(word) {
+        if (word.length === 0) return 'a';
+        const vowels = ['a', 'e', 'i', 'o', 'u'];
+        return vowels.includes(word.charAt(0).toLowerCase()) ? 'an' : 'a';
+      }
+
+      function checkAllFieldsFilled() {
+        const fields = ['name', 'country', 'nationality', 'food', 'place', 'language'];
+        return fields.every(id => getValue(id).length > 0);
+      }
+
+      function updateFlagDisplay() {
+        const countryInput = getValue('country').toLowerCase();
+        const flag = countryFlags[countryInput] || '🌍';
+        document.getElementById('flagDisplay').textContent = flag;
+      }
+
+      function updateButtonState() {
+        const btn = document.getElementById('submitBtn');
+        const allFilled = checkAllFieldsFilled();
+        btn.disabled = !allFilled;
+        btn.textContent = allFilled ? '✅ Submit' : '⚠️ Fill all fields to submit';
+      }
+
+      // Update on input
+      document.getElementById('country').addEventListener('input', updateFlagDisplay);
+      ['name', 'country', 'nationality', 'food', 'place', 'language'].forEach(id => {
+        document.getElementById(id).addEventListener('input', updateButtonState);
+      });
+
+      async function checkGrammar() {
+        const resultsDiv = document.getElementById('results');
+
+        if (!checkAllFieldsFilled()) {
+          resultsDiv.innerHTML = '<div class="error-message">❌ Please fill in all fields before submitting!</div>';
+          return;
+        }
+
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        resultsDiv.innerHTML = '<p style="text-align: center; font-weight: bold;">⏳ Checking grammar...</p>';
+
+        // Build full sentences with proper capitalization and a/an logic
+        const nationalityValue = capitalizeFirstLetter(getValue('nationality'));
+        const article = getArticle(nationalityValue);
+        
+        const fields = [
+          { label: 'Name',               sentence: 'My name is ' + capitalizeFirstLetter(getValue('name')) + '.' },
+          { label: 'Country',            sentence: 'I am from ' + capitalizeFirstLetter(getValue('country')) + '.' },
+          { label: 'Nationality',        sentence: 'I am ' + article + ' ' + nationalityValue + '.' },
+          { label: 'Famous Food',        sentence: capitalizeFirstLetter(getValue('food')) + ' is a famous food in my country.' },
+          { label: 'Popular Place',      sentence: 'In my country, ' + capitalizeFirstLetter(getValue('place')) + ' is a popular place.' },
+          { label: 'National Language',  sentence: 'My country\'s national language is ' + capitalizeFirstLetter(getValue('language')) + '.' },
+        ];
+
+        let anyErrors = false;
+        let html = '';
+
+        for (const field of fields) {
+          try {
+            const params = new URLSearchParams({
+              text: field.sentence,
+              language: 'en-US',
+            });
+
+            const response = await fetch('https://api.languagetool.org/v2/check', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: params.toString(),
+            });
+
+            if (!response.ok) throw new Error('LanguageTool API error: ' + response.status);
+
+            const data = await response.json();
+            const matches = data.matches;
+
+            if (matches.length === 0) {
+              html += `<div class="success-message">✅ <strong>${field.label}:</strong> "${field.sentence}"</div>`;
+            } else {
+              anyErrors = true;
+              html += `<div class="error-message"><strong>❌ ${field.label}:</strong> "${field.sentence}"<ul style="margin-top: 8px; padding-left: 20px;">`;
+              for (const match of matches) {
+                const snippet = field.sentence.substring(match.offset, match.offset + match.length);
+                const suggestions = match.replacements.slice(0, 3).map(r => `<strong>${r.value}</strong>`).join(' or ');
+                html += `<li style="margin: 6px 0;">
+                  <span class="error">"${snippet}"</span>${suggestions ? ' → ' + suggestions : ''}<br>
+                  <small>${match.message}</small>
+                </li>`;
+              }
+              html += '</ul></div>';
+            }
+          } catch (err) {
+            html += `<div class="error-message">❌ Could not check <strong>${field.label}</strong>: ${err.message}</div>`;
+          }
+        }
+
+        if (!anyErrors) {
+          html = '<div class="perfect-banner">🎉 Perfect! No grammar mistakes found.</div>' + html;
+        }
+
+        resultsDiv.innerHTML = html;
+        btn.disabled = false;
+      }
+
+      document.getElementById('submitBtn').addEventListener('click', checkGrammar);
+
+      // Initialize button state
+      updateButtonState();
+    </script>
+  </body>
+</html>
